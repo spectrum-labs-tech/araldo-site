@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+{{template "head"}}
+<title>Araldo: one API to announce your product everywhere</title>
+<meta name="description" content="Araldo is an open-source distribution API: your product sends one announcement, and Araldo checks it against every platform's rules, schedules it, publishes it, and reports what it brought.">
+</head>
+<body>
+{{template "header"}}
+<main id="main">
+  <section class="hero wrap">
+    <p class="eyebrow">Open source · self-hosted · API first</p>
+    <h1>One API to announce your product everywhere.</h1>
+    <p class="lede">Your product sends Araldo an announcement. Araldo renders it for every social network, checks it against each one's real rules, schedules it, publishes it, and tells you where it landed and what it brought.</p>
+    <p class="actions">
+      <a class="button primary" href="/docs/">Read the docs</a>
+      <a class="button" href="https://github.com/spectrum-labs-tech/araldo">View on GitHub</a>
+    </p>
+  </section>
+
+  <section class="wrap" aria-labelledby="example">
+    <h2 id="example">Built to be called by your code, and by your agents</h2>
+    <pre class="code"><code>curl https://araldo.example/v1/posts \
+  -H "Authorization: Bearer ald_live_…" \
+  -H "Idempotency-Key: build-8812" \
+  -d '{"brand": "my-product",
+       "template": "featured-build",
+       "data": {"name": "Recce", "url": "https://example.com/b/8812"},
+       "publish_at": "next_slot"}'</code></pre>
+    <p>Preview any post first: every rule it breaks comes back with a stable code, so an AI agent can fix its own text. Assistants such as Claude can use Araldo directly through its MCP server.</p>
+  </section>
+
+  <section class="wrap" aria-labelledby="features">
+    <h2 id="features">What it does</h2>
+    <ul class="grid">
+      <li><h3>Every platform's rules, checked first</h3><p>Length counted the way each network counts it, threads, images and video, before anything is scheduled.</p></li>
+      <li><h3>Templates with data</h3><p>A template per kind of announcement, its data checked against a JSON Schema, with a body per platform.</p></li>
+      <li><h3>Scheduling and slots</h3><p>At a time, now, or in the brand's next free weekly slot, taken when the post is approved.</p></li>
+      <li><h3>Never double-posts silently</h3><p>An attempt whose outcome is unknown is retried only where retrying is safe; otherwise it waits for a person.</p></li>
+      <li><h3>Images and video</h3><p>Images too big for a network are resized for it, never cropped. Video streams through your storage and is never transcoded.</p></li>
+      <li><h3>Newsletters</h3><p>Write, approve and schedule issues here; your email provider sends them and keeps the list. Brevo first.</p></li>
+      <li><h3>Signups, not just likes</h3><p>Reads your own Plausible or GA4 to credit signups to each post, and puts cost per signup beside your ad spend.</p></li>
+      <li><h3>Monthly reports</h3><p>A brand's month beside the one before: publishing, engagement, traffic, ads and newsletters, ready to print.</p></li>
+      <li><h3>Teams and approvals</h3><p>Organizations, brands, roles, approval policies, MFA, scoped API keys and an audit log.</p></li>
+      <li><h3>Test mode</h3><p>Sandbox channels follow each network's rules and can simulate failures, so you can build before any network approves your app.</p></li>
+      <li><h3>Webhooks</h3><p>Signed events for every change, with retries and a delivery log.</p></li>
+      <li><h3>Yours to run</h3><p>One binary and Postgres, a Helm chart, and S3-compatible storage for media. Your keys, your data.</p></li>
+    </ul>
+  </section>
+
+  <section class="wrap" aria-labelledby="platforms">
+    <h2 id="platforms">Where it posts</h2>
+    <p class="platforms">Bluesky · Mastodon · Gab · X · LinkedIn · Threads · Facebook Pages · Instagram · Pinterest · YouTube · TikTok · Discord · Telegram</p>
+    <p>Networks that sign in with OAuth connect through your own developer apps, so the posting limits and the relationship are yours.</p>
+  </section>
+
+  <section class="wrap callout" aria-labelledby="status">
+    <h2 id="status">Status</h2>
+    <p>Araldo is pre-alpha: it runs and publishes every day, and its API may still change. A hosted plan is planned; until then, <a href="/docs/operations.html">run it yourself</a>.</p>
+  </section>
+</main>
+{{template "footer"}}
+</body>
+</html>

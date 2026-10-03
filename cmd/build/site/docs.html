@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+{{template "head"}}
+<title>Docs · Araldo</title>
+<meta name="description" content="Araldo's documentation: running it, its architecture, the API contract and the decisions behind it.">
+</head>
+<body>
+{{template "header"}}
+<main id="main" class="wrap prose">
+  <h1>Documentation</h1>
+  <p>Start with the overview and how to run Araldo. The API is described by its <a href="/openapi.yaml">OpenAPI contract</a>; the decision records explain why it works the way it does.</p>
+  {{range .Sections}}{{if .Docs}}
+  <h2 id="{{if eq .Name "Decisions"}}decisions{{else}}{{.Name}}{{end}}">{{.Name}}</h2>
+  <ul class="doclist">
+    {{range .Docs}}<li><a href="{{.URL}}">{{.Title}}</a></li>
+    {{end}}
+  </ul>
+  {{end}}{{end}}
+</main>
+{{template "footer"}}
+</body>
+</html>

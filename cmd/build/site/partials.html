@@ -1,0 +1,22 @@
+{{define "head"}}<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="/style.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">{{end}}
+
+{{define "header"}}<a class="skip" href="#main">Skip to content</a>
+<header class="top">
+  <nav class="wrap nav" aria-label="Site">
+    <a class="mark" href="/"><img src="/favicon.svg" alt="" width="24" height="24"> Araldo</a>
+    <a href="/docs/">Docs</a>
+    <a href="/docs/operations.html">Self-hosting</a>
+    <a href="/docs/roadmap.html">Roadmap</a>
+    <a href="https://github.com/spectrum-labs-tech/araldo">GitHub</a>
+  </nav>
+</header>{{end}}
+
+{{define "footer"}}<footer class="foot">
+  <div class="wrap">
+    <p>Araldo is open source under the <a href="https://github.com/spectrum-labs-tech/araldo/blob/main/LICENSE">AGPL-3.0</a>; its API contract and client SDKs are Apache-2.0. Made by Spectrum Labs.</p>
+  </div>
+</footer>{{end}}
