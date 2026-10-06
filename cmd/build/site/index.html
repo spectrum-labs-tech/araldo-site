@@ -3,19 +3,21 @@
 <head>
 {{template "head"}}
 <title>Araldo: one API to announce your product everywhere</title>
-<meta name="description" content="Araldo is an open-source distribution API: your product sends one announcement, and Araldo checks it against every platform's rules, schedules it, publishes it, and reports what it brought.">
+<meta name="description" content="Araldo is a distribution API: your product sends one announcement, and Araldo checks it against every platform's rules, schedules it, publishes it, and reports what it brought. Hosted from $29 a month with a 14-day trial, or open source to run yourself.">
 </head>
 <body>
 {{template "header"}}
 <main id="main">
   <section class="hero wrap">
-    <p class="eyebrow">Open source · self-hosted · API first</p>
+    <p class="eyebrow">Hosted or self-hosted · open source · API first</p>
     <h1>One API to announce your product everywhere.</h1>
     <p class="lede">Your product sends Araldo an announcement. Araldo renders it for every social network, checks it against each one's real rules, schedules it, publishes it, and tells you where it landed and what it brought.</p>
     <p class="actions">
-      <a class="button primary" href="/docs/">Read the docs</a>
-      <a class="button" href="https://github.com/spectrum-labs-tech/araldo">View on GitHub</a>
+      <a class="button primary" href="{{account "/signup"}}">Start a 14-day trial</a>
+      <a class="button" href="#pricing">See pricing</a>
+      <a class="button" href="{{docs "/"}}">Read the docs</a>
     </p>
+    <p class="note">Or run it yourself for free: it's open source.</p>
   </section>
 
   <section class="wrap" aria-labelledby="example">
@@ -44,7 +46,7 @@
       <li><h3>Teams and approvals</h3><p>Organizations, brands, roles, approval policies, MFA, scoped API keys and an audit log.</p></li>
       <li><h3>Test mode</h3><p>Sandbox channels follow each network's rules and can simulate failures, so you can build before any network approves your app.</p></li>
       <li><h3>Webhooks</h3><p>Signed events for every change, with retries and a delivery log.</p></li>
-      <li><h3>Yours to run</h3><p>One binary and Postgres, a Helm chart, and S3-compatible storage for media. Your keys, your data.</p></li>
+      <li><h3>Hosted, or yours to run</h3><p>Sign up and start posting, or run one binary and Postgres yourself, with a Helm chart and S3-compatible storage for media.</p></li>
     </ul>
   </section>
 
@@ -54,9 +56,45 @@
     <p>Networks that sign in with OAuth connect through your own developer apps, so the posting limits and the relationship are yours.</p>
   </section>
 
+  <section class="wrap" aria-labelledby="pricing">
+    <h2 id="pricing">Pricing</h2>
+    <p>Every plan starts with a 14-day free trial; the first charge comes when it ends. Posts are never counted. Pay yearly and get two months free.</p>
+    <ul class="plans">
+      <li>
+        <h3>Starter</h3>
+        <p class="price"><strong>$29</strong> a month</p>
+        <p class="muted">or $290 a year</p>
+        <ul><li>1 brand</li><li>5 channels</li><li>3 people</li><li>Unlimited posts</li></ul>
+        <a class="button primary" href="{{account "/signup?plan=starter"}}">Start a trial</a>
+      </li>
+      <li>
+        <h3>Team</h3>
+        <p class="price"><strong>$79</strong> a month</p>
+        <p class="muted">or $790 a year</p>
+        <ul><li>5 brands</li><li>25 channels</li><li>10 people</li><li>Unlimited posts</li></ul>
+        <a class="button primary" href="{{account "/signup?plan=team"}}">Start a trial</a>
+      </li>
+      <li>
+        <h3>Agency</h3>
+        <p class="price"><strong>$199</strong> a month</p>
+        <p class="muted">or $1,990 a year</p>
+        <ul><li>25 brands</li><li>100 channels</li><li>Unlimited people</li><li>Unlimited posts</li></ul>
+        <a class="button primary" href="{{account "/signup?plan=agency"}}">Start a trial</a>
+      </li>
+      <li>
+        <h3>Self-hosted</h3>
+        <p class="price"><strong>Free</strong></p>
+        <p class="muted">open source, AGPL-3.0</p>
+        <ul><li>Every feature</li><li>No limits</li><li>Your servers and keys</li><li>Your own developer apps</li></ul>
+        <a class="button" href="{{docs "/operations.html"}}">Run it yourself</a>
+      </li>
+    </ul>
+    <p class="muted">X bills its API per call, so on every plan X connects through your own X developer app and its charges are yours. Already signed up? <a href="{{app "/"}}">Sign in</a>.</p>
+  </section>
+
   <section class="wrap callout" aria-labelledby="status">
     <h2 id="status">Status</h2>
-    <p>Araldo is pre-alpha: it runs and publishes every day, and its API may still change. A hosted plan is planned; until then, <a href="/docs/operations.html">run it yourself</a>.</p>
+    <p>Araldo is pre-alpha: it runs and publishes every day, and its API may still change.</p>
   </section>
 </main>
 {{template "footer"}}

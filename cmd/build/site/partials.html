@@ -7,11 +7,13 @@
 {{define "header"}}<a class="skip" href="#main">Skip to content</a>
 <header class="top">
   <nav class="wrap nav" aria-label="Site">
-    <a class="mark" href="/"><img src="/favicon.svg" alt="" width="24" height="24"> Araldo</a>
-    <a href="/docs/">Docs</a>
-    <a href="/docs/operations.html">Self-hosting</a>
-    <a href="/docs/roadmap.html">Roadmap</a>
+    <a class="mark" href="{{site "/"}}"><img src="/favicon.svg" alt="" width="24" height="24"> Araldo</a>
+    <a href="{{docs "/"}}">Docs</a>
+    <a href="{{docs "/operations.html"}}">Self-hosting</a>
+    <a href="{{site "/#pricing"}}">Pricing</a>
+    <a href="{{docs "/roadmap.html"}}">Roadmap</a>
     <a href="https://github.com/spectrum-labs-tech/araldo">GitHub</a>
+    <a href="{{app "/"}}">Sign in</a>
   </nav>
 </header>{{end}}
 

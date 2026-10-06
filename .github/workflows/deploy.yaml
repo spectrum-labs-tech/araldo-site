@@ -1,5 +1,5 @@
-# Builds araldo.dev from this repo and the app repo's docs, and publishes it to the Cloudflare Pages
-# project araldo-site. It runs on every push to main, daily (so the app's docs reach the site within
+# Builds araldo.dev and docs.araldo.dev from this repo and the app repo's docs, and publishes
+# dist/site to the Cloudflare Pages project araldo-site and dist/docs to araldo-docs. It runs on every push to main, daily (so the app's docs reach the site within
 # a day of changing), and by hand. Pull requests only build: nothing is published from a branch, so
 # no secret is used where a fork's code could run.
 
@@ -47,9 +47,16 @@ jobs:
         with:
           name: site
           path: dist
-      - name: Publish to Cloudflare Pages
+      # The docs first: the site's redirects point at them.
+      - name: Publish docs.araldo.dev
         uses: cloudflare/wrangler-action@953926a2e2182532811c01a25e53647d93bf07c0 # v4.1.3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=araldo-site --branch=main
+          command: pages deploy dist/docs --project-name=araldo-docs --branch=main
+      - name: Publish araldo.dev
+        uses: cloudflare/wrangler-action@953926a2e2182532811c01a25e53647d93bf07c0 # v4.1.3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist/site --project-name=araldo-site --branch=main

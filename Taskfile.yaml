@@ -19,6 +19,6 @@ tasks:
       - go test ./...
 
   serve:
-    desc: Build, then serve dist on http://localhost:8000 to look at it
+    desc: Build, then serve dist/site (or HOST=docs) on http://localhost:8000 to look at it
     deps: [build]
-    cmd: python -m http.server 8000 --directory dist
+    cmd: python -m http.server 8000 --directory dist/{{.HOST | default "site"}}

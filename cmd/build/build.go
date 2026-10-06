@@ -25,6 +25,29 @@ import (
 // Repo is where links into the app's code go.
 const Repo = "https://github.com/spectrum-labs-tech/araldo"
 
+// SiteURL serves the landing page and DocsURL the documentation, each from
+// its own directory of the build (site and docs). Links between them are
+// absolute; links within one are paths.
+const (
+	SiteURL = "https://araldo.dev"
+	DocsURL = "https://docs.araldo.dev"
+)
+
+// The hosted plan: AppURL is its dashboard and AccountURL where people
+// sign up and pay.
+const (
+	AppURL     = "https://app.araldo.dev"
+	AccountURL = "https://account.araldo.dev"
+)
+
+// redirects sends the docs' old addresses on araldo.dev, under /docs/, to
+// the same page on the docs host (Cloudflare Pages' _redirects).
+const redirects = `/docs ` + DocsURL + `/ 301
+/docs/ ` + DocsURL + `/ 301
+/docs/* ` + DocsURL + `/:splat 301
+/openapi.yaml ` + DocsURL + `/openapi.yaml 301
+`
+
 //go:embed site
 var siteFS embed.FS
 
@@ -32,7 +55,7 @@ var siteFS embed.FS
 type Doc struct {
 	// Src is its path in the app repo, with forward slashes.
 	Src string
-	// URL is its absolute path on the site.
+	// URL is its absolute path on the docs host.
 	URL string
 	// Section groups it in the docs index.
 	Section string
@@ -44,13 +67,13 @@ type Doc struct {
 // docs lists the app repo's documents and where each goes. ADRs are added
 // from the adr directory.
 var docs = []Doc{
-	{Src: "README.md", URL: "/docs/overview.html", Section: "Start", Title: "Overview"},
-	{Src: "docs/operations.md", URL: "/docs/operations.html", Section: "Start"},
-	{Src: "docs/architecture.md", URL: "/docs/architecture.html", Section: "Start"},
-	{Src: "docs/errors.md", URL: "/docs/errors.html", Section: "Reference"},
-	{Src: "docs/roadmap.md", URL: "/docs/roadmap.html", Section: "Project"},
-	{Src: "CONTRIBUTING.md", URL: "/docs/contributing.html", Section: "Project"},
-	{Src: "SECURITY.md", URL: "/docs/security.html", Section: "Project"},
+	{Src: "README.md", URL: "/overview.html", Section: "Start", Title: "Overview"},
+	{Src: "docs/operations.md", URL: "/operations.html", Section: "Start"},
+	{Src: "docs/architecture.md", URL: "/architecture.html", Section: "Start"},
+	{Src: "docs/errors.md", URL: "/errors.html", Section: "Reference"},
+	{Src: "docs/roadmap.md", URL: "/roadmap.html", Section: "Project"},
+	{Src: "CONTRIBUTING.md", URL: "/contributing.html", Section: "Project"},
+	{Src: "SECURITY.md", URL: "/security.html", Section: "Project"},
 }
 
 // copied are files published as they are.
@@ -70,16 +93,22 @@ func Build(app, out string) (int, error) {
 	for src, url := range copied {
 		urls[src] = url
 	}
-	urls["docs/adr"] = "/docs/#decisions"
-	urls["docs/adr/"] = "/docs/#decisions"
+	urls["docs/adr"] = "/#decisions"
+	urls["docs/adr/"] = "/#decisions"
 
-	tmpl, err := template.ParseFS(siteFS, "site/*.html")
+	tmpl, err := template.New("").Funcs(template.FuncMap{
+		"site":    func(p string) string { return SiteURL + p },
+		"docs":    func(p string) string { return DocsURL + p },
+		"app":     func(p string) string { return AppURL + p },
+		"account": func(p string) string { return AccountURL + p },
+	}).ParseFS(siteFS, "site/*.html")
 	if err != nil {
 		return 0, err
 	}
 	if err := os.RemoveAll(out); err != nil {
 		return 0, err
 	}
+	site, docsDir := filepath.Join(out, "site"), filepath.Join(out, "docs")
 	n := 0
 	for i := range all {
 		d := &all[i]
@@ -95,15 +124,18 @@ func Build(app, out string) (int, error) {
 			d.Title = title
 		}
 		d.Body = body
-		if err := write(out, d.URL, tmpl, "doc.html", map[string]any{"Doc": d, "Docs": all}); err != nil {
+		if err := write(docsDir, d.URL, tmpl, "doc.html", map[string]any{"Doc": d, "Docs": all}); err != nil {
 			return 0, err
 		}
 		n++
 	}
-	if err := write(out, "/docs/index.html", tmpl, "docs.html", map[string]any{"Sections": sections(all)}); err != nil {
+	if err := write(docsDir, "/index.html", tmpl, "docs.html", map[string]any{"Sections": sections(all)}); err != nil {
 		return 0, err
 	}
-	if err := write(out, "/index.html", tmpl, "index.html", nil); err != nil {
+	if err := write(site, "/index.html", tmpl, "index.html", nil); err != nil {
+		return 0, err
+	}
+	if err := writeFile(site, "/_redirects", []byte(redirects)); err != nil {
 		return 0, err
 	}
 	n += 2
@@ -112,7 +144,7 @@ func Build(app, out string) (int, error) {
 		if err != nil {
 			return 0, err
 		}
-		if err := writeFile(out, url, data); err != nil {
+		if err := writeFile(docsDir, url, data); err != nil {
 			return 0, err
 		}
 	}
@@ -128,7 +160,12 @@ func Build(app, out string) (int, error) {
 		if err != nil {
 			return err
 		}
-		return writeFile(out, "/"+p, data)
+		for _, dir := range []string{site, docsDir} {
+			if err := writeFile(dir, "/"+p, data); err != nil {
+				return err
+			}
+		}
+		return nil
 	})
 	return n, err
 }
@@ -149,7 +186,7 @@ func listDocs(app string) ([]Doc, error) {
 	}
 	sort.Strings(adrs)
 	for _, name := range adrs {
-		out = append(out, Doc{Src: "docs/adr/" + name, URL: "/docs/adr/" + strings.TrimSuffix(name, ".md") + ".html", Section: "Decisions"})
+		out = append(out, Doc{Src: "docs/adr/" + name, URL: "/adr/" + strings.TrimSuffix(name, ".md") + ".html", Section: "Decisions"})
 	}
 	return out, nil
 }

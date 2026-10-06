@@ -1,7 +1,9 @@
 # araldo.dev
 
-The website for [Araldo](https://github.com/spectrum-labs-tech/araldo), the open-source distribution
-API: a landing page, and the app repo's documentation rendered as HTML.
+The websites for [Araldo](https://github.com/spectrum-labs-tech/araldo), the open-source distribution
+API: araldo.dev, the landing page with the hosted plan and its prices, and docs.araldo.dev, the app
+repo's documentation rendered as HTML. The docs' old addresses under araldo.dev/docs/ redirect to the
+same pages there.
 
 The docs are not copied here. They live in the app repo, next to the code they describe, and the
 build reads them from a checkout of it: `README.md`, `docs/*.md`, the decision records in
@@ -17,14 +19,14 @@ beside this one.
 ```sh
 task build                 # dist/ from ../araldo
 task build APP=/path/to/araldo
-task serve                 # build, then look at it on http://localhost:8000
+task serve                 # build, then look at araldo.dev on http://localhost:8000 (HOST=docs for the docs)
 task check                 # format, vet and tests
 ```
 
 ## Deploy
 
 `.github/workflows/deploy.yaml` builds on every push to `main`, daily and by hand, and publishes
-`dist/` to the Cloudflare Pages project `araldo-site` with the `CLOUDFLARE_API_TOKEN` and
+`dist/site` to the Cloudflare Pages project `araldo-site` and `dist/docs` to `araldo-docs`, with the `CLOUDFLARE_API_TOKEN` and
 `CLOUDFLARE_ACCOUNT_ID` secrets. Pull requests build and test but publish nothing.
 
 ## License

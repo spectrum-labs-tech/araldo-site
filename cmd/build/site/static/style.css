@@ -59,6 +59,14 @@ h3 { font-size: 1.05rem; margin: 0 0 .35rem; }
 .grid li { background: var(--panel); border: 1px solid var(--line); border-radius: .6rem; padding: 1rem 1.1rem; }
 .grid p { margin: 0; color: var(--muted); font-size: .95rem; }
 .platforms { font-weight: 600; }
+.note, .muted { color: var(--muted); }
+.plans { list-style: none; padding: 0; display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr)); }
+.plans > li { display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: .6rem; padding: 1.1rem 1.2rem; }
+.plans p { margin: 0; }
+.plans .price { margin-top: .25rem; }
+.plans .price strong { font-size: 1.9rem; }
+.plans ul { padding-left: 1.1rem; margin: .9rem 0 1.1rem; flex: 1; }
+.plans .button { text-align: center; }
 .callout { background: var(--panel); border: 1px solid var(--line); border-radius: .6rem; margin: 2rem auto; padding: 1.25rem 1.5rem; }
 
 pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }

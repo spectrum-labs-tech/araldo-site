@@ -12,20 +12,20 @@ import (
 func TestRewrite(t *testing.T) {
 	t.Parallel()
 	urls := map[string]string{
-		"docs/operations.md":     "/docs/operations.html",
-		"docs/adr/0017-media.md": "/docs/adr/0017-media.html",
+		"docs/operations.md":     "/operations.html",
+		"docs/adr/0017-media.md": "/adr/0017-media.html",
 		"api/openapi.yaml":       "/openapi.yaml",
-		"docs/adr":               "/docs/#decisions",
+		"docs/adr":               "/#decisions",
 	}
 	tests := []struct {
 		dest, src, want string
 	}{
-		{"docs/operations.md", "README.md", "/docs/operations.html"},
-		{"docs/operations.md#ai-assistants-mcp", "README.md", "/docs/operations.html#ai-assistants-mcp"},
-		{"0017-media.md", "docs/adr/0018-engagement.md", "/docs/adr/0017-media.html"},
-		{"adr/0017-media.md", "docs/roadmap.md", "/docs/adr/0017-media.html"},
+		{"docs/operations.md", "README.md", "/operations.html"},
+		{"docs/operations.md#ai-assistants-mcp", "README.md", "/operations.html#ai-assistants-mcp"},
+		{"0017-media.md", "docs/adr/0018-engagement.md", "/adr/0017-media.html"},
+		{"adr/0017-media.md", "docs/roadmap.md", "/adr/0017-media.html"},
 		{"../api/openapi.yaml", "docs/operations.md", "/openapi.yaml"},
-		{"docs/adr/", "README.md", "/docs/#decisions"},
+		{"docs/adr/", "README.md", "/#decisions"},
 		{"LICENSE", "README.md", Repo + "/blob/main/LICENSE"},
 		{"../internal/platform/rules.go", "docs/architecture.md", Repo + "/blob/main/internal/platform/rules.go"},
 		{"../internal/platform/", "docs/architecture.md", Repo + "/tree/main/internal/platform"},
@@ -89,14 +89,16 @@ func TestBuild(t *testing.T) {
 		return string(b)
 	}
 	checks := map[string][]string{
-		"docs/overview.html":       {"<title>Overview · Araldo docs</title>", `href="/docs/operations.html"`, `href="/docs/#decisions"`},
+		"docs/overview.html":       {"<title>Overview · Araldo docs</title>", `href="/operations.html"`, `href="/#decisions"`, `href="` + SiteURL + `/"`},
 		"docs/operations.html":     {"<h1>Operating Araldo</h1>", "<table>", "<code>ARALDO_LISTEN</code>", "<!-- raw HTML omitted -->"},
 		"docs/architecture.html":   {`href="` + Repo + `/blob/main/internal/platform/rules.go"`},
-		"docs/adr/0001-scope.html": {`href="/docs/roadmap.html#now"`, "Edit this page on GitHub"},
-		"docs/index.html":          {`href="/docs/adr/0001-scope.html">ADR 0001: Scope</a>`, `id="decisions"`},
-		"index.html":               {"<h1>One API to announce your product everywhere.</h1>"},
-		"openapi.yaml":             {"openapi: 3.1.0"},
-		"style.css":                {"--accent"},
+		"docs/adr/0001-scope.html": {`href="/roadmap.html#now"`, "Edit this page on GitHub"},
+		"docs/index.html":          {`href="/adr/0001-scope.html">ADR 0001: Scope</a>`, `id="decisions"`},
+		"docs/openapi.yaml":        {"openapi: 3.1.0"},
+		"docs/style.css":           {"--accent"},
+		"site/index.html":          {"<h1>", `href="` + DocsURL + `/"`, `id="pricing"`, `href="` + AccountURL + `/signup?plan=team"`, `href="` + AppURL + `/"`},
+		"site/style.css":           {"--accent"},
+		"site/_redirects":          {"/docs/* " + DocsURL + "/:splat 301", "/openapi.yaml " + DocsURL + "/openapi.yaml 301"},
 	}
 	for name, wants := range checks {
 		got := read(name)
@@ -109,8 +111,10 @@ func TestBuild(t *testing.T) {
 	if strings.Contains(read("docs/operations.html"), "<script>") {
 		t.Error("raw HTML in a document reached the page")
 	}
-	if _, err := os.Stat(filepath.Join(out, "docs", "adr", "template.html")); !os.IsNotExist(err) {
-		t.Error("the ADR template was published")
+	for _, stray := range []string{"docs/adr/template.html", "site/operations.html", "site/docs/index.html", "docs/_redirects"} {
+		if _, err := os.Stat(filepath.Join(out, filepath.FromSlash(stray))); !os.IsNotExist(err) {
+			t.Errorf("%s was published", stray)
+		}
 	}
 }
 
