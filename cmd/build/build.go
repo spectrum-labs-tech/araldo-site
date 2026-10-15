@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/fs"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -48,6 +49,14 @@ const redirects = `/docs ` + DocsURL + `/ 301
 /openapi.yaml ` + DocsURL + `/openapi.yaml 301
 `
 
+// plausibleInit is Plausible's setup snippet, served from the site's own
+// origin beside the tracker so pages need no inline script. Nothing in it
+// is site-specific: the tracker's filename names the site.
+const plausibleInit = `window.plausible = window.plausible || function () { (plausible.q = plausible.q || []).push(arguments); };
+plausible.init = plausible.init || function (i) { plausible.o = i || {}; };
+plausible.init();
+`
+
 //go:embed site
 var siteFS embed.FS
 
@@ -80,8 +89,12 @@ var docs = []Doc{
 var copied = map[string]string{"api/openapi.yaml": "/openapi.yaml"}
 
 // Build writes the site from the app checkout in app into out, and returns
-// how many pages it wrote.
-func Build(app, out string) (int, error) {
+// how many pages it wrote. analytics is the address of a Plausible site's
+// tracker (https://…/js/pa-….js), or "" for pages with no analytics.
+func Build(app, out, analytics string) (int, error) {
+	if err := checkAnalytics(analytics); err != nil {
+		return 0, err
+	}
 	all, err := listDocs(app)
 	if err != nil {
 		return 0, err
@@ -97,10 +110,11 @@ func Build(app, out string) (int, error) {
 	urls["docs/adr/"] = "/#decisions"
 
 	tmpl, err := template.New("").Funcs(template.FuncMap{
-		"site":    func(p string) string { return SiteURL + p },
-		"docs":    func(p string) string { return DocsURL + p },
-		"app":     func(p string) string { return AppURL + p },
-		"account": func(p string) string { return AccountURL + p },
+		"site":      func(p string) string { return SiteURL + p },
+		"docs":      func(p string) string { return DocsURL + p },
+		"app":       func(p string) string { return AppURL + p },
+		"account":   func(p string) string { return AccountURL + p },
+		"analytics": func() string { return analytics },
 	}).ParseFS(siteFS, "site/*.html")
 	if err != nil {
 		return 0, err
@@ -167,7 +181,28 @@ func Build(app, out string) (int, error) {
 		}
 		return nil
 	})
-	return n, err
+	if err != nil || analytics == "" {
+		return n, err
+	}
+	for _, dir := range []string{site, docsDir} {
+		if err := writeFile(dir, "/plausible-init.js", []byte(plausibleInit)); err != nil {
+			return 0, err
+		}
+	}
+	return n, nil
+}
+
+// checkAnalytics refuses a tracker address that is not an https URL of a
+// script, so a typo in the deploy fails the build instead of the pages.
+func checkAnalytics(analytics string) error {
+	if analytics == "" {
+		return nil
+	}
+	u, err := url.Parse(analytics)
+	if err != nil || u.Scheme != "https" || u.Host == "" || !strings.HasSuffix(u.Path, ".js") || u.RawQuery != "" {
+		return fmt.Errorf("-plausible %q is not the https address of a tracker script", analytics)
+	}
+	return nil
 }
 
 // listDocs is the fixed documents and every ADR but the template.

@@ -2,7 +2,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
 <link rel="stylesheet" href="/style.css">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">{{end}}
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+{{- with analytics}}
+<script async src="{{.}}"></script>
+<script defer src="/plausible-init.js"></script>
+{{- end}}{{end}}
 
 {{define "header"}}<a class="skip" href="#main">Skip to content</a>
 <header class="top">

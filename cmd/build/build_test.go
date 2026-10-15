@@ -73,7 +73,7 @@ func fakeApp(t *testing.T) string {
 func TestBuild(t *testing.T) {
 	t.Parallel()
 	out := filepath.Join(t.TempDir(), "dist")
-	n, err := Build(fakeApp(t), out)
+	n, err := Build(fakeApp(t), out, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -120,7 +120,58 @@ func TestBuild(t *testing.T) {
 
 func TestBuildNeedsTheAppRepo(t *testing.T) {
 	t.Parallel()
-	if _, err := Build(t.TempDir(), filepath.Join(t.TempDir(), "dist")); err == nil {
+	if _, err := Build(t.TempDir(), filepath.Join(t.TempDir(), "dist"), ""); err == nil {
 		t.Fatal("built without the app's docs")
+	}
+}
+
+// TestBuildAnalytics checks that pages load Plausible only when the build
+// names a tracker, and that a bad address fails the build.
+func TestBuildAnalytics(t *testing.T) {
+	t.Parallel()
+	const tracker = "https://analytics.example/js/pa-abc123.js"
+	tests := []struct {
+		name      string
+		analytics string
+		wantErr   bool
+	}{
+		{name: "off by default", analytics: ""},
+		{name: "a tracker", analytics: tracker},
+		{name: "not https", analytics: "http://analytics.example/js/pa-abc123.js", wantErr: true},
+		{name: "not a script", analytics: "https://analytics.example/", wantErr: true},
+		{name: "not a URL", analytics: "pa-abc123.js", wantErr: true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			out := filepath.Join(t.TempDir(), "dist")
+			_, err := Build(fakeApp(t), out, tt.analytics)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatal("built with a bad tracker address")
+				}
+				return
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, page := range []string{"site/index.html", "docs/index.html", "docs/overview.html"} {
+				b, err := os.ReadFile(filepath.Join(out, filepath.FromSlash(page)))
+				if err != nil {
+					t.Fatal(err)
+				}
+				loads := strings.Contains(string(b), `<script async src="`+tracker+`"></script>`) &&
+					strings.Contains(string(b), `<script defer src="/plausible-init.js"></script>`)
+				if loads != (tt.analytics != "") || (tt.analytics == "" && strings.Contains(string(b), "<script")) {
+					t.Errorf("%s: loads Plausible = %v, want %v", page, loads, tt.analytics != "")
+				}
+			}
+			for _, dir := range []string{"site", "docs"} {
+				_, err := os.Stat(filepath.Join(out, dir, "plausible-init.js"))
+				if published := err == nil; published != (tt.analytics != "") {
+					t.Errorf("%s/plausible-init.js published = %v, want %v", dir, published, tt.analytics != "")
+				}
+			}
+		})
 	}
 }

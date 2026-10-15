@@ -11,5 +11,7 @@ The araldo.dev websites: `cmd/build` renders the landing page (`cmd/build/site/i
 - **Claims on the landing page must be true of the app's `main`.** Check the app repo before
   describing a feature, a platform or a status.
 - **No JavaScript** unless a page truly needs it; pages work as plain HTML and CSS, in light and
-  dark, at WCAG AA contrast, with one `h1` each.
+  dark, at WCAG AA contrast, with one `h1` each. The one script is opt-in analytics: Plausible,
+  loaded only when the build gets `-plausible` (the deploy passes the `PLAUSIBLE_SCRIPT`
+  repository variable, so the instance's host never appears in this repo).
 - Every Go file starts with `// SPDX-License-Identifier: AGPL-3.0-or-later`. `task check` must pass.

@@ -29,7 +29,11 @@ jobs:
         with:
           go-version-file: go.mod
       - run: go vet ./... && go test ./...
-      - run: go run ./cmd/build -app araldo -out dist
+      # Analytics: the repo variable PLAUSIBLE_SCRIPT is the araldo.dev Plausible site's tracker
+      # address (public; it ships in every page). Unset, the pages load no analytics.
+      - run: go run ./cmd/build -app araldo -out dist -plausible "$PLAUSIBLE_SCRIPT"
+        env:
+          PLAUSIBLE_SCRIPT: ${{ vars.PLAUSIBLE_SCRIPT }}
       - uses: actions/upload-artifact@v7
         with:
           name: site

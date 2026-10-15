@@ -29,6 +29,10 @@ task check                 # format, vet and tests
 `dist/site` to the Cloudflare Pages project `araldo-site` and `dist/docs` to `araldo-docs`, with the `CLOUDFLARE_API_TOKEN` and
 `CLOUDFLARE_ACCOUNT_ID` secrets. Pull requests build and test but publish nothing.
 
+**Analytics.** With the repository variable `PLAUSIBLE_SCRIPT` set to a Plausible site's tracker
+address (`https://…/js/pa-….js`), every page on both hosts loads it, plus `/plausible-init.js`
+beside it; Plausible sets no cookies. Unset (local builds, forks), the pages load no script at all.
+
 ## License
 
 [AGPL-3.0-or-later](LICENSE), like Araldo itself.
